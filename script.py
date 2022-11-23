@@ -1,8 +1,3 @@
-import pandas as pd
-import requests as rq
-from bs4 import BeautifulSoup as bs
-import scrapy
-
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait as wait
@@ -25,8 +20,3 @@ for film in films:
     link = film.get_attribute('href')
     links.append(link)
 print(links)
-
-
-
-
-
