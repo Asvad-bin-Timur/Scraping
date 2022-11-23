@@ -16,14 +16,15 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
-chrome_options = Options()
-chrome_options.add_argument('--headless')
-chrome_options.add_argument('--no-sandbox')
-chrome_options.add_argument('--disable-dev-shm-usage')
 s = Service('/usr/bin/chromedriver')
-d = webdriver.Chrome(service=s, options=chrome_options)
-d.get('https://www.google.nl/')
-
+d = webdriver.Chrome(service=s)
+d.get('https://www.kinopoisk.ru/lists/movies/top250/')
+films = d.find_elements(By.CLASS_NAME,'base-movie-main-info_link__YwtP1')
+links = []
+for film in films:
+    link = film.get_attribute('href')
+    links.append(link)
+print(links)
 
 
 
