@@ -1,3 +1,6 @@
+# TODO: write imports in use, prune not used ones
+# TODO: make README file with project description
+# TODO: look at logger library to use logs instead of prints
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait as wait
@@ -11,6 +14,9 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
+
+
+# TODO: write implicit variables s -> service, d -> driver
 s = Service('/usr/bin/chromedriver')
 d = webdriver.Chrome(service=s)
 d.get('https://www.kinopoisk.ru/lists/movies/top250/')
