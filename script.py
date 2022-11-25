@@ -27,3 +27,4 @@ class film_links:
 page1 = film_links('https://www.kinopoisk.ru/lists/movies/top250/', 'base-movie-main-info_link__YwtP1')
 page1.make_a_list()
 page1.show_links()
+
