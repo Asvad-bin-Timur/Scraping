@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 class KinoPoisk(webdriver.Chrome):
     def __init__(
         self,        
-        base_url = 'https://www.kinopoisk.ru/lists/movies/top250/',
+        base_url = 'https://www.kinopoisk.ru/lists/movies/top250/?page=1',
         teardown=False
     ):
         self.base_url = base_url
@@ -38,12 +38,23 @@ class KinoPoisk(webdriver.Chrome):
             link = film.get_attribute('href')
             links.append(link)
         return links
+
+    def find_all_pages(self, number_of_pages, class_name):
+        links = []
+        for page in range(1,number_of_pages+1):
+            self.get(f'https://www.kinopoisk.ru/lists/movies/top250/?page={page}')
+            films = self.find_elements(By.CLASS_NAME,class_name)
+            for film in films:
+                link = film.get_attribute('href')
+                links.append(link)
+        return links
+
     
 
-
-
 with KinoPoisk() as Parser:
-    Parser.go_to_page()
-    links = Parser.find_film_links()
-    print(links)
+    links = Parser.find_all_pages(number_of_pages=5, class_name='base-movie-main-info_link__YwtP1')
+    print(len(links))
+
+
+
 
