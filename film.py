@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+import pandas as pd
 
 
 class KinoPoisk(webdriver.Chrome):
@@ -12,7 +13,7 @@ class KinoPoisk(webdriver.Chrome):
         self.base_url = base_url
         self.teardown = teardown
 
-        service = Service('/usr/bin/chromedriver')
+        service = Service(executable_path='/usr/bin/chromedriver')
         options = webdriver.ChromeOptions()
         options.add_argument('--headless')
         options.add_argument('--ignore-certificate-errors')
@@ -33,28 +34,41 @@ class KinoPoisk(webdriver.Chrome):
     
     def find_film_links(self, class_name= 'base-movie-main-info_link__YwtP1'):
         films = self.find_elements(By.CLASS_NAME,class_name)
-        links = []
+        self.links = []
         for film in films:
             link = film.get_attribute('href')
-            links.append(link)
-        return links
+            self.links.append(link)
+        return self.links
 
-    def find_all_pages(self, number_of_pages, class_name):
-        links = []
-        for page in range(1,number_of_pages+1):
-            self.get(f'https://www.kinopoisk.ru/lists/movies/top250/?page={page}')
-            films = self.find_elements(By.CLASS_NAME,class_name)
-            for film in films:
-                link = film.get_attribute('href')
-                links.append(link)
-        return links
-
+    def find_all_links(self):
+        all_links = []
+        page = 0
+        loop = True
+        while loop == True:
+            page = page + 1
+            url_of_page = f'https://www.kinopoisk.ru/lists/movies/top250/?page={page}'
+            self.go_to_page(url=url_of_page)
+            links = self.find_film_links()
+            if links != []:
+                all_links = all_links + links
+                continue
+            else:
+                loop = False
+        return all_links 
+            
     
+    def film_characteristics(self):
+            self.get('https://www.kinopoisk.ru/film/435/')
+            characteristics = self.find_elements(By.CLASS_NAME,'styles_row__da_RK')
+            characteristics_text = []
+            for characteristic in characteristics:
+                ch = characteristic.text.split("\n")
+                characteristics_text.append(ch)
+            return characteristics_text
 
 with KinoPoisk() as Parser:
-    links = Parser.find_all_pages(number_of_pages=5, class_name='base-movie-main-info_link__YwtP1')
-    print(len(links))
-
+    all_links = Parser.find_all_links()
+    print(len(all_links))
 
 
 
