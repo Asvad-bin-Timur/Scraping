@@ -41,7 +41,7 @@ class KinoPoisk(webdriver.Chrome):
         return self.links
 
     def find_all_links(self):
-        all_links = []
+        self.all_links = []
         page = 0
         loop = True
         while loop == True:
@@ -50,25 +50,28 @@ class KinoPoisk(webdriver.Chrome):
             self.go_to_page(url=url_of_page)
             links = self.find_film_links()
             if links != []:
-                all_links = all_links + links
+                self.all_links = self.all_links + links
                 continue
             else:
                 loop = False
-        return all_links 
+        return self.all_links 
             
     
-    def film_characteristics(self):
+    def film_characteristics(self, class_name, split_sign):
             self.get('https://www.kinopoisk.ru/film/435/')
-            characteristics = self.find_elements(By.CLASS_NAME,'styles_row__da_RK')
+            characteristics = self.find_elements(By.CLASS_NAME, class_name)
             characteristics_text = []
             for characteristic in characteristics:
-                ch = characteristic.text.split("\n")
+                ch = characteristic.text.split(split_sign)
                 characteristics_text.append(ch)
             return characteristics_text
 
 with KinoPoisk() as Parser:
     all_links = Parser.find_all_links()
     print(len(all_links))
+    characteristics = Parser.film_characteristics(class_name='styles_row__da_RK', split_sign="\n")
+    print(characteristics)
+
 
 
 
