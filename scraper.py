@@ -4,6 +4,20 @@ from selenium.webdriver.common.by import By
 
 
 class KinoPoisk(webdriver.Chrome):
+    """Class is used for parsing and analysing data from Kinopoisk website
+
+    Args:
+        webdriver (_type_): _description_
+
+    Methods:
+    go_to_page()
+        Method to go to the website
+    find_film_links()
+        Method to get url links to single movie
+    film_characteristics()
+        Method to get data to single movie
+
+    """
     def __init__(
         self,
         base_url='https://www.kinopoisk.ru/lists/movies/top250/?page=',
@@ -35,10 +49,15 @@ class KinoPoisk(webdriver.Chrome):
     def __exit__(self, exc_type, exc_value, ex_traceback):
         print('End Parsing')
 
-    def go_to_page(self, url):
+    def go_to_page(self, url: str):
+        """Method to go to the web page through url
+
+        Args:
+            url (_type_): _description_
+        """
         self.get(url)
 
-    def find_film_links(self, class_name: str='base-movie-main-info_link__YwtP1') -> list[str]:
+    def find_film_links(self, class_name: str = 'base-movie-main-info_link__YwtP1') -> list[str]:
         """Method to get url links to single movie from top 250 list of movies
 
         Args:
@@ -54,12 +73,20 @@ class KinoPoisk(webdriver.Chrome):
             links.append(link)
         return links
 
-    def film_characteristics(self):
-        self.go_to_page('https://www.kinopoisk.ru/film/435/')
-        characteristics = self.find_elements(
-            By.CLASS_NAME, 'styles_row__da_RK'
-        )
+    def film_characteristics(self, class_name_characteristics: str ='styles_row__da_RK', class_name_title: str='styles_rootInDark__SZlor') -> list[list]:
+        """Method to get data to single movie from top 250 list of movies
+
+        Args:
+            class_name_characteristics (str, optional): _description_. Defaults to 'styles_row__da_RK'.
+            class_name_title (str, optional): _description_. Defaults to 'styles_rootInDark__SZlor'.
+
+        Returns:
+            _type_: _description_
+        """
+        characteristics = self.find_elements(By.CLASS_NAME, class_name_characteristics)
         characteristics_text = []
+        film_name = self.find_element(By.CLASS_NAME, class_name_title).text
+        characteristics_text.append(['Название фильма',film_name])
         for characteristic in characteristics:
             ch = characteristic.text.split("\n")
             characteristics_text.append(ch)
