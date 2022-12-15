@@ -48,6 +48,7 @@ class KinoPoisk(webdriver.Chrome):
 
     def __exit__(self, exc_type, exc_value, ex_traceback):
         print('End Parsing')
+        self.quit()
 
     def go_to_page(self, url: str):
         """Method to go to the web page through url
