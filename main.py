@@ -1,6 +1,8 @@
 from scraper import KinoPoisk
 from logger_info import logger
 import pandas as pd
+from selenium.webdriver.common.by import By
+
 
 def main():
     with KinoPoisk() as Parser:
@@ -21,31 +23,41 @@ def main():
             else:
                 break
         logger.info(f'Total parsed links: {len(all_links)}')
-        
+
+        logger.info('Starting getting columns')
+        all_columns = []
+        link_number = 0
+        for link in all_links:
+            Parser.go_to_page(url=link)
+            columns = Parser.find_elements(By.CLASS_NAME, 'styles_title__b1HVo')
+            for column in columns:
+                all_columns.append(column.text)
+            link_number += 1
+            logger.info(f'Processed {link_number} films columns')
+        all_columns = list(set(all_columns))
+        logger.info('All_columns is set')
+
         film = 0
-        links = all_links[0:2]
-        for link in links:
+        columns = {column: [] for column in all_columns}
+        columns['Название фильма'] = []
+        for link in all_links:
             Parser.go_to_page(link)
             characteristics = Parser.film_characteristics()
-            columns = list(d.keys())
-            columns_of_film = []
-            if d == {}:
-                for ch in characteristics:
-                    d[ch[0]] = [ch[1:2]]
-            else:
-                for ch in characteristics:    
-                    d[ch[0]] = [d[ch[0]], ch[1:2]]
-                    columns_of_film.append(ch[0])
-            for column in columns:
-                if column not in columns_of_film:
-                    d[column] = [d[column], 'Null']
+            film_data = {ch[0]: ch[1:2] for ch in characteristics}
+            for column in list(columns.keys()):
+                if column not in list(film_data.keys()):
+                    film_data[column] = ['Null']
                 else:
                     continue
+            for row in film_data:
+                if columns[row] == []:
+                    columns[row] = film_data[row]
+                else:
+                    columns[row].extend(film_data[row])
             film += 1
-            logger.info(f'Proccessed {film} films')
-        df = pd.DataFrame(d)
-        print(df)
-
+            logger.info(f'Processed {film} films')
+        df = pd.DataFrame(columns)
+        df.to_csv('Kinopoisk.csv')
 
 
 if __name__ == '__main__':

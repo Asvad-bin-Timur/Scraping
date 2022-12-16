@@ -74,7 +74,7 @@ class KinoPoisk(webdriver.Chrome):
             links.append(link)
         return links
 
-    def film_characteristics(self, class_name_characteristics: str ='styles_row__da_RK', class_name_title: str='styles_rootInDark__SZlor') -> list[list]:
+    def film_characteristics(self, class_name_characteristics: str ='styles_row__da_RK', class_name_title: str='styles_title__hTCAr') -> list[list]:
         """Method to get data to single movie from top 250 list of movies
 
         Args:
@@ -87,8 +87,11 @@ class KinoPoisk(webdriver.Chrome):
         characteristics = self.find_elements(By.CLASS_NAME, class_name_characteristics)
         characteristics_text = []
         film_name = self.find_element(By.CLASS_NAME, class_name_title).text
-        characteristics_text.append(['Название фильма',film_name])
+        characteristics_text.append(['Название фильма',film_name.split("\n")])
         for characteristic in characteristics:
             ch = characteristic.text.split("\n")
-            characteristics_text.append(ch)
+            if '4K доступно только на больших экранах' in ch or 'Качество видео' in ch:
+                continue
+            else:
+                characteristics_text.append(ch)
         return characteristics_text
