@@ -1,7 +1,6 @@
 from scraper import KinoPoisk
 from logger_info import logger
 import pandas as pd
-from selenium.webdriver.common.by import By
 
 
 def find_links(parser: KinoPoisk) -> list[str]:
