@@ -1,6 +1,10 @@
 from scraper import KinoPoisk
 from logger_info import logger
 import pandas as pd
+import numpy as np
+import sqlite3 as sql
+import csv
+from sqlalchemy import create_engine
 
 
 def find_links(parser: KinoPoisk) -> list[str]:
@@ -36,6 +40,14 @@ def find_all_film_data(parser: KinoPoisk, all_links: list) -> list[dict]:
 
     return all_film_data
 
+def create_db_table():
+    sqlite_file = 'KinoPoisk.db'
+    table_name = 'films_data'
+    conn = sql.connect(sqlite_file)
+    pd.read_csv('KinoPoisk.csv').to_sql(table_name, con=conn)
+    conn.commit()
+    conn.close()
+
 
 def main():
 
@@ -43,9 +55,10 @@ def main():
 
         all_links = find_links(parser)
         all_film_data = find_all_film_data(parser, all_links)
-
         df = pd.DataFrame(all_film_data)
-        df.to_csv('KinoPoisk_2.csv', index=False)
+        #df = df.astype(np.string_)
+        df.to_csv('KinoPoisk.csv', index=False)
+    create_db_table()
 
 
 if __name__ == '__main__':
