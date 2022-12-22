@@ -84,61 +84,39 @@ class KinoPoisk(webdriver.Chrome):
 
         return links
 
-    def film_characteristics(
-        self,
-        class_name_characteristics: str = 'styles_row__da_RK',
-        class_name_title: str = 'styles_title__hTCAr'
-    ) -> list[list]:
-        """Method to get data from single movie from top 250 list of movies
-
-        Args:
-            class_name_characteristics (str, optional): Name of the class of movie characteristics.
-            Defaults to 'styles_row__da_RK'.
-            class_name_title (str, optional): Name of thew class of movie name.
-            Defaults to 'styles_rootInDark__SZlor'.
-
-        Returns:
-            list: List of lists of movie characteristics
-        """
-
-        characteristics_text = []
-
-        film_name = self.find_element(By.CLASS_NAME, class_name_title).text
-        characteristics_text.append(['Название фильма', film_name.split("\n")])
-        characteristics = self.find_elements(
-            By.CLASS_NAME, class_name_characteristics
-        )
-        for characteristic in characteristics:
-            ch = characteristic.text.split("\n")
-            if ch not in ('4K доступно только на больших экранах', 'Качество видео'):
-                characteristics_text.append(ch)
-
-        return characteristics_text
 
     def film_characteristics(
         self,
         class_name_characteristics: str = 'styles_row__da_RK',
-        class_name_title: str = 'styles_title__hTCAr'
+        class_name_title: str = 'styles_title__hTCAr',
+        class_name_actors: str = 'styles_list___ufg4',
+        class_name_film_score: str = 'styles_ratingKpTop__84afd'
+
     ) -> dict[str, str]:
         """Method to get data from single movie from top 250 list of movies
 
         Args:
             class_name_characteristics (str, optional): Name of the class of movie characteristics.
             Defaults to 'styles_row__da_RK'.
-            class_name_title (str, optional): Name of thew class of movie name.
+            class_name_title (str, optional): Name of the class of movie name.
             Defaults to 'styles_rootInDark__SZlor'.
+            class_name_actors (str, optional): Name of the class of movie actors.
+            Defaults to 'styles_list___ufg4'.
+            class_name_film_score (str, optional): Name of the class of movie's score in KinoPoisk.
+            Defaults to 'styles_ratingKpTop__84afd'.
 
         Returns:
             dict: Data dictionary for single movie
         """
         film_name = self.find_element(By.CLASS_NAME, class_name_title).text
-        characteristics = self.find_elements(
-            By.CLASS_NAME, class_name_characteristics
-        )
+        actors = self.find_element(By.CLASS_NAME, class_name_actors).text
+        score = self.find_element(By.CLASS_NAME, class_name_film_score).text
+        
+        characteristics = self.find_elements(By.CLASS_NAME, class_name_characteristics)
 
-        film_data = {ch[0]: ch[1:2] for ch in (characteristic.text.split("\n") for characteristic in characteristics) if ch not in (
-            '4K доступно только на больших экранах', 'Качество видео'
-        )}
+        film_data = {ch[0]: ch[1:2] for ch in (characteristic.text.split("\n") for characteristic in characteristics)}
         film_data['Название фильма'] = film_name.split("\n")
+        film_data['Актеры'] = actors.split("\n")
+        film_data['Оценка фильма'] = score.split("\n")
 
         return film_data
