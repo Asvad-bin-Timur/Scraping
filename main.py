@@ -1,11 +1,8 @@
 from scraper import KinoPoisk
 from logger_info import logger
 import pandas as pd
-import numpy as np
-from selenium.webdriver.common.by import By
 import sqlite3 as sql
-import csv
-from sqlalchemy import create_engine
+
 
 
 def find_links(parser: KinoPoisk) -> list[str]:
