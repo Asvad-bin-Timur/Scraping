@@ -84,7 +84,6 @@ class KinoPoisk(webdriver.Chrome):
 
         return links
 
-
     def film_characteristics(
         self,
         class_name_characteristics: str = 'styles_row__da_RK',
@@ -111,10 +110,12 @@ class KinoPoisk(webdriver.Chrome):
         film_name = self.find_element(By.CLASS_NAME, class_name_title).text
         actors = self.find_element(By.CLASS_NAME, class_name_actors).text
         score = self.find_element(By.CLASS_NAME, class_name_film_score).text
-        
-        characteristics = self.find_elements(By.CLASS_NAME, class_name_characteristics)
 
-        film_data = {''.join(ch[0]): ''.join(ch[1:2]) for ch in (characteristic.text.split("\n") for characteristic in characteristics)}
+        characteristics = self.find_elements(
+            By.CLASS_NAME, class_name_characteristics)
+
+        film_data = {''.join(ch[0]): ''.join(ch[1:2]) for ch in (
+            characteristic.text.split("\n") for characteristic in characteristics)}
         film_data['Название фильма'] = ''.join(film_name.split("\n"))
         film_data['Актеры'] = ''.join(actors.split("\n"))
         film_data['Оценка фильма'] = ''.join(score.split("\n"))
