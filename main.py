@@ -3,8 +3,6 @@ from logger_info import logger
 import pandas as pd
 import sqlite3 as sql
 from Data_processing import DataTransformation
-from datetime import date
-
 
 
 def find_links(parser: KinoPoisk) -> list[str]:
@@ -28,6 +26,7 @@ def find_links(parser: KinoPoisk) -> list[str]:
 
     return all_links
 
+
 def find_all_film_data(parser: KinoPoisk, all_links: list) -> list[dict]:
     all_film_data = []
     for link_number, link in enumerate(all_links):
@@ -36,7 +35,8 @@ def find_all_film_data(parser: KinoPoisk, all_links: list) -> list[dict]:
         all_film_data.append(film_data)
         logger.info(f'Got data from the {link_number+1} link film')
     return all_film_data
-        
+
+
 def create_db_table(df):
     sqlite_file = 'KinoPoisk.db'
     table_name = 'films_data'
@@ -44,6 +44,7 @@ def create_db_table(df):
     df.to_sql(table_name, con=conn)
     conn.commit()
     conn.close()
+
 
 def main():
     with KinoPoisk() as parser:
@@ -58,7 +59,8 @@ def main():
     transformer.views_column()
     transformer.fees_columns()
     transformer.df_cleared.to_csv('KinoPoisk_processed', index=False)
-    create_db_table(df=df)
+    create_db_table(df)
+
 
 if __name__ == '__main__':
     main()
