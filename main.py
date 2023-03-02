@@ -3,6 +3,7 @@ from logger_info import logger
 import pandas as pd
 import sqlite3 as sql
 from Data_processing import DataTransformation
+import time
 
 
 def find_links(parser: KinoPoisk) -> list[str]:
@@ -14,7 +15,12 @@ def find_links(parser: KinoPoisk) -> list[str]:
         url_of_page = parser.base_url + str(page)
         parser.go_to_page(url_of_page)
         logger.info(f'Went to page: {page}')
-        links = parser.find_film_links()
+        try:
+            links = parser.find_film_links()
+        except:
+            logger.info('There is a captcha, please pass it manually')
+            time.sleep(15)
+            links = parser.find_film_links()
         logger.info(f'Parsed {len(links)} links')
         if links != []:
             all_links.extend(links)
@@ -51,11 +57,11 @@ def main():
         all_links = find_links(parser)
         all_film_data = find_all_film_data(parser, all_links)
         df = pd.DataFrame(all_film_data)
-
+        df.to_csv('KinoPoisk.csv', index=False)
+    df = pd.read_csv('KinoPoisk.csv')
     transformer = DataTransformation(df)
     transformer.dropping_columns()
     transformer.budget_column()
-    transformer.categorical_columns()
     transformer.views_column()
     transformer.fees_columns()
     transformer.df_cleared.to_csv('KinoPoisk_processed', index=False)

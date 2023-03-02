@@ -1,9 +1,7 @@
 import pandas as pd
 import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-import matplotlib.ticker as tick
 import plotly.express as px
+import re
 
 
 def reformat_large_tick_values(tick_val, pos):
@@ -59,26 +57,78 @@ def show_values(axs, orient="v", space=0):
     else:
         _single(axs)
 
-def bar_plot(df, name_of_category_column, name_of_measerment_column, title_name='', aggregation_func='mean', scale_of_axis = None):
-    cols = name_of_category_column+': '
+def bar_plot(df, name_of_category_column, name_of_measerment_column, title_name, aggregation_func='mean', scale_of_axis=None):
+    all_categories = []
+    for record in df[name_of_category_column]:
+        new_record = record.split(',')
+        for word in new_record:
+            word = word.strip()
+        all_categories.append(word)
+    all_categories = list(set(all_categories))
     if aggregation_func == 'mean':
-        dictionary = {col.split(': ')[1]: df[df[col]==True][name_of_measerment_column].mean() for col in df.columns if cols in col}
+        measurement_by_category = {category: df[df[name_of_category_column].str.contains(re.escape(category))][name_of_measerment_column].mean()
+                                   for category in all_categories}
     elif aggregation_func == 'median':
-        dictionary = {col.split(': ')[1]: df[df[col]==True][name_of_measerment_column].median() for col in df.columns if cols in col}
-    for element in dictionary.copy():
-        if 'nan' in str(dictionary[element]):
-            del dictionary[element]
-    dictionary = dict(sorted(dictionary.items(), key=lambda x:x[1], reverse=False))
-    df_small = pd.melt(pd.DataFrame(dictionary, index=[0]))
-    df_small.loc[(df_small['value']/df_small['value'].sum())<0.03, 'variable'] = 'другие'
-    figure = px.bar(df_small, y=df_small['variable'], x=df_small['value'], text = df_small['value'], title=title_name)
-    return figure
+        measurement_by_category = {category: df[df[name_of_category_column].str.contains(category)][name_of_measerment_column].median() 
+                                   for category in all_categories}
+    dictionary = dict(sorted(measurement_by_category.items(), 
+                                key=lambda x:x[1], 
+                                reverse=False))
+    df_small = pd.melt(pd.DataFrame(dictionary, 
+                                    index=[0]))
+    df_small.loc[(df_small['value']/df_small['value'].sum())<0.03, 'variable'] = 'другое'
+    df_small.loc[len(df_small.index)] = ['другие', df_small[df_small['variable']=='другое']['value'].sum()] 
+    df_small.drop(df_small[df_small['variable']=='другое'].index, 
+                  inplace=True)
+    df_small = df_small.sort_values(by=['value'], 
+                                    ascending=True)
+    fig = px.histogram(data_frame=df_small,
+                       y='variable', 
+                       x='value', 
+                       title=title_name, 
+                       text_auto='.2s')
+    fig.update_layout(barmode='stack', 
+                      xaxis={'categoryorder': 'total descending', 
+                             'visible': False, 
+                             'showticklabels' : False}, 
+                      yaxis={'visible': True, 
+                             'title' : None, 
+                             'showticklabels' : True},
+                      xaxis_range=scale_of_axis,
+                      width=600,
+                      height=600,
+                      title={'x':0.5,
+                             'xanchor': 'center'}
+                      )
+    return fig
+
 
 def count_plot(df, name_of_category_column, title_name):
-    cols = name_of_category_column+': '
-    dictionary = {col.split(': ')[1]: df[df[col]==True]['Название фильма'].count() for col in df.columns if cols in col}
-    dictionary = dict(sorted(dictionary.items(), key=lambda x:x[1], reverse=True))
-    df_small = pd.melt(pd.DataFrame(dictionary, index=[0]))
-    df.small = df_small.loc[(df_small['value']/df_small['value'].sum())<0.04, 'variable'] = 'другие'
-    fig = px.pie(data_frame=df_small, names=df_small['variable'], values=df_small['value'], title=title_name)
+    all_categories = []
+    for record in df[name_of_category_column]:
+        new_record = record.split(',')
+        for word in new_record:
+            word = word.strip()
+        all_categories.append(word)
+    all_categories = list(set(all_categories))
+    dictionary = {category: df[df[name_of_category_column].str.contains(re.escape(category))]['Название фильма'].count()
+              for category in all_categories}
+    dictionary = dict(sorted(dictionary.items(), 
+                             key=lambda x:x[1], 
+                             reverse=True))
+    df_small = pd.melt(pd.DataFrame(dictionary, 
+                                    index=[0]))
+    df_small.loc[(df_small['value']/df_small['value'].sum())<0.04, 
+                 'variable'] = 'другие'
+    fig = px.pie(data_frame=df_small, 
+                 names=df_small['variable'], 
+                 values=df_small['value'], 
+                 title=title_name)
+    fig.update_layout(title={'x':0.5,
+                             'xanchor': 'center'},
+                      width=500,
+                      height=450)
     return fig
+
+
+
