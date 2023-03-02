@@ -23,78 +23,82 @@ fig = px.line(viewers_per_year,
               title='Maximum number of viewers per year of production')
 
 # Define the layout of the app
-app.layout = html.Div(children=[
-    html.H1(children='KinoPoisk Dashboard (top films)'),
+app.layout = html.Div(
+    children=[
+        html.H1(children='KinoPoisk Dashboard (top films)'),
 
-    html.Div([
-        dcc.RangeSlider(
-            min=df['Год производства'].min(),
-            max=df['Год производства'].max(),
-            id='slider_years',
-            marks={int(year): {'label': str(year)} for year in years},
-            value=[df['Год производства'].min(), df['Год производства'].max()],
-            step=1,
-            className='range-slider'
-        )
-    ], className='range-slider-container'),
+            html.Div(
+            [
+                dcc.RangeSlider(
+                    min=df['Год производства'].min(),
+                    max=df['Год производства'].max(),
+                    id='slider_years',
+                    marks={int(year): {'label': str(year)} for year in years},
+                    value=[df['Год производства'].min(), df['Год производства'].max()],
+                    step=1,
+                    className='range-slider'
+                )
+            ], 
+            className='range-slider-container'),
 
-    html.Div([
-        dcc.Graph(
-            id='viewers_per_year',
-            figure=fig,
-            className='line-plot'
-        )
-    ], className='line-plot-container'),
+            html.Div([
+                dcc.Graph(
+                    id='viewers_per_year',
+                    figure=fig,
+                    className='line-plot'
+                )
+            ], className='line-plot-container'),
 
-    html.Div([
-        dcc.Dropdown(
-            options=[{'label': 'Genres', 'value': 'Genres'},
-                     {'label': 'Countries', 'value': 'Countries'}],
-            value='Genres',
-            id='dropdown_pie',
-            className='dropdown'
-        )
-    ], className='dropdown-container'),
+            html.Div([
+                dcc.Dropdown(
+                    options=[{'label': 'Genres', 'value': 'Genres'},
+                            {'label': 'Countries', 'value': 'Countries'}],
+                    value='Genres',
+                    id='dropdown_pie',
+                    className='dropdown'
+                )
+            ], className='dropdown-container'),
 
-    html.Div([
-        dcc.Graph(
-            id='number_of_films',
-            figure=count_plot(df=df,
-                              name_of_category_column='Жанр',
-                              title_name='The percentage of top films by genre'),
-            className='pie-chart'
-        )
-    ], className='pie-chart-container'),
+            html.Div([
+                dcc.Graph(
+                    id='number_of_films',
+                    figure=count_plot(df=df,
+                                    name_of_category_column='Жанр',
+                                    title_name='The percentage of top films by genre'),
+                    className='pie-chart'
+                )
+            ], className='pie-chart-container'),
 
-    html.Div([
-        dcc.Dropdown(
-            options=[{'label': 'Genres', 'value': 'Genres'},
-                     {'label': 'Countries', 'value': 'Countries'}],
-            value='Genres',
-            id='dropdown_bar_category',
-            className='dropdown-bar-category'
-        ),
-        dcc.Dropdown(
-            options=[{'label': 'Revenue', 'value': 'Revenue'},
-                     {'label': 'Viewers', 'value': 'Viewers'},
-                     {'label': 'Score', 'value': 'Score'}],
-            value='Revenue',
-            id='dropdown_bar_measure',
-            className='dropdown-bar-measure'
-        )
-    ], className='dropdown-bar-container'),
+            html.Div([
+                dcc.Dropdown(
+                    options=[{'label': 'Genres', 'value': 'Genres'},
+                            {'label': 'Countries', 'value': 'Countries'}],
+                    value='Genres',
+                    id='dropdown_bar_category',
+                    className='dropdown-bar-category'
+                ),
+                dcc.Dropdown(
+                    options=[{'label': 'Revenue', 'value': 'Revenue'},
+                            {'label': 'Viewers', 'value': 'Viewers'},
+                            {'label': 'Score', 'value': 'Score'}],
+                    value='Revenue',
+                    id='dropdown_bar_measure',
+                    className='dropdown-bar-measure'
+                )
+            ], className='dropdown-bar-container'),
 
-    html.Div([
-        dcc.Graph(
-            id='bar_plot',
-            figure=bar_plot(df=df,
-                            name_of_category_column='Жанр',
-                            name_of_measerment_column='Сборы в мире',
-                            title_name='The average Revenue of top films by genre'),
-            className='bar-chart'
-        )
-    ], className='bar-chart-container')
-])
+            html.Div([
+                dcc.Graph(
+                    id='bar_plot',
+                    figure=bar_plot(df=df,
+                                    name_of_category_column='Жанр',
+                                    name_of_measerment_column='Сборы в мире',
+                                    title_name='The average Revenue of top films by genre'),
+                    className='bar-chart'
+                )
+            ], className='bar-chart-container')
+                ]
+                      )
 
 # Define the callbacks
 
