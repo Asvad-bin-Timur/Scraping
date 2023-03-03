@@ -4,9 +4,18 @@ import pandas as pd
 import plotly.express as px
 from Vis_func import bar_plot
 from Vis_func import count_plot
+import sqlite3
+import numpy as np
 
-# Load data
-df = pd.read_csv('KinoPoisk_processed')
+# Load and prepare data
+cnx = sqlite3.connect('KinoPoisk.db')
+df = pd.read_sql_query("SELECT * FROM films_data", cnx)
+df = df.fillna(value=np.nan)
+
+num_columns = ['Сборы в мире', 'Сборы в США', 'Оценка фильма']
+for col in num_columns:
+    df[col] = pd.to_numeric(df[col])
+df['Год производства'] = pd.to_numeric(df['Год производства'], downcast="integer")
 
 # Initialize the app
 app = Dash()

@@ -37,7 +37,12 @@ def find_all_film_data(parser: KinoPoisk, all_links: list) -> list[dict]:
     all_film_data = []
     for link_number, link in enumerate(all_links):
         parser.go_to_page(link)
-        film_data = parser.film_characteristics()
+        try:
+            film_data = parser.film_characteristics()
+        except:
+            logger.info('There is a captcha, please pass it manually')
+            time.sleep(15)
+            film_data = parser.film_characteristics()
         all_film_data.append(film_data)
         logger.info(f'Got data from the {link_number+1} link film')
     return all_film_data
@@ -47,7 +52,7 @@ def create_db_table(df):
     sqlite_file = 'KinoPoisk.db'
     table_name = 'films_data'
     conn = sql.connect(sqlite_file)
-    df.to_sql(table_name, con=conn)
+    df.to_sql(table_name, con=conn, index=False)
     conn.commit()
     conn.close()
 
@@ -57,15 +62,13 @@ def main():
         all_links = find_links(parser)
         all_film_data = find_all_film_data(parser, all_links)
         df = pd.DataFrame(all_film_data)
-        df.to_csv('KinoPoisk.csv', index=False)
-    df = pd.read_csv('KinoPoisk.csv')
+
     transformer = DataTransformation(df)
     transformer.dropping_columns()
     transformer.budget_column()
     transformer.views_column()
     transformer.fees_columns()
-    transformer.df_cleared.to_csv('KinoPoisk_processed', index=False)
-    create_db_table(df)
+    create_db_table(transformer.df_cleared)
 
 
 if __name__ == '__main__':
