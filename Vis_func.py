@@ -1,9 +1,20 @@
 import pandas as pd
+import plotly
+from plotly.subplots import make_subplots
 import plotly.express as px
 import re
+import numpy as np
+from wordcloud import WordCloud, STOPWORDS
+from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
+import matplotlib.ticker as tick
+import plotly.graph_objs as go
+import seaborn as sns
 
 
-def reformat_large_tick_values(tick_val,
+
+def reformat_large_tick_values(
+                        tick_val,
                                pos):
     """
     Turns large tick values (in the billions, millions and thousands) such as 4500 into 4.5K and also appropriately turns 4000 into 4K (no zero after the decimal).
@@ -115,6 +126,78 @@ def count_plot(df, name_of_category_column, title_name):
                  title=title_name)
     fig.update_layout(title={'x': 0.5,
                              'xanchor': 'center'},
-                      width=500,
-                      height=500)
+                      width=600,
+                      height=500,
+                      margin=dict(
+                            l=(1 - 0.8) / 2 * 600,
+                            r=(1 - 0.8) / 2 * 600,
+                            t=(1 - 0.8) / 2 * 500,
+                            b=(1 - 0.8) / 2 * 500))
     return fig
+
+def words_cloud(df, column = 'Слоган'):
+    text = " ".join(review for review in df[column])
+    stopwords = set(STOPWORDS)
+    stopwords.update(["Beyond", "will", 'может'])
+    wordcloud = WordCloud(stopwords=stopwords,
+                        background_color="white",
+                        min_word_length=4,
+                        collocation_threshold=10,
+                        scale=2,
+                        width=700, height=400).generate(text)
+    # get the dimensions of the word cloud image
+    width, height = wordcloud.width, wordcloud.height
+    # create a figure using Plotly's make_subplots function
+    fig = make_subplots(rows=1, cols=1)
+    # add the word cloud trace to the figure
+    fig.add_trace(
+        go.Image(z=wordcloud.to_array()),
+        row=1, col=1
+    )
+    # configure the layout of the figure
+    fig.update_layout(
+        margin=dict(l=15, r=15, t=40, b=20),
+        paper_bgcolor='white',
+        width=width,
+        height=height,
+        xaxis=dict(showticklabels=False),
+        yaxis=dict(showticklabels=False)
+    )
+    # return the Plotly figure
+    return fig
+
+def box_plot(df, measurement_column):
+    # create subplot with one row and two columns
+    fig = make_subplots(rows=1, cols=1)
+
+    # add box plot trace to first column
+    fig.add_trace(
+        go.Box(
+            x=df[measurement_column],
+            y=df['Оценка фильма'],
+            orientation='h',
+            name='Box Plot',
+        ),
+        row=1, col=1
+    )
+
+    # update layout
+    fig.update_layout(
+        title='Box Plot',
+        xaxis=dict(title=measurement_column),
+        yaxis=dict(title='Оценка фильма'),
+        width=600,
+        height=500,
+        margin=dict(
+            l=(1 - 0.8) / 2 * 600,
+            r=(1 - 0.8) / 2 * 600,
+            t=(1 - 0.8) / 2 * 500,
+            b=(1 - 0.8) / 2 * 500
+        ),
+    )
+
+    return fig
+
+    
+
+
