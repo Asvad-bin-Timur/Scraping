@@ -6,5 +6,4 @@ RUN python -m venv venv && venv/bin/pip install --upgrade pip wheel setuptools
 RUN venv/bin/pip install -r req.txt
 COPY . /app
 EXPOSE 8050
-CMD gunicorn Dashboard:app.server -b :8000
-# ENTRYPOINT [ "/app/venv/bin/python","/app/Dashboard.py" ]
+ENTRYPOINT [ "/app/venv/bin/python","/app/Dashboard.py" ]

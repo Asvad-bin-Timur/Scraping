@@ -2,7 +2,7 @@ import pandas as pd
 from plotly.subplots import make_subplots
 import plotly.express as px
 import re
-# from wordcloud import WordCloud, STOPWORDS
+from wordcloud import WordCloud, STOPWORDS
 import plotly.graph_objs as go
 
 
