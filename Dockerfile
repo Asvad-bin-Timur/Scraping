@@ -5,4 +5,6 @@ RUN apt-get update && apt-get upgrade -y && apt-get install virtualenv pkg-confi
 RUN python -m venv venv && venv/bin/pip install --upgrade pip wheel setuptools
 RUN venv/bin/pip install -r req.txt
 COPY . /app
-ENTRYPOINT [ "/app/venv/bin/python","/app/Dashboard.py" ]
+EXPOSE 8050
+CMD gunicorn Dashboard:app.server -b :8000
+# ENTRYPOINT [ "/app/venv/bin/python","/app/Dashboard.py" ]

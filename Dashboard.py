@@ -6,6 +6,10 @@ import plotly.express as px
 from Vis_func import *
 import sqlite3
 import numpy as np
+import os
+import flask
+
+server = flask.Flask(__name__)
 
 # Load and prepare data
 cnx = sqlite3.connect('KinoPoisk.db')
@@ -336,7 +340,9 @@ def update_box_plot(column):
 
 
 if __name__ == '__main__':
-    app.run_server(
+    app.run(
+        host = os.getenv("HOST", "127.0.0.1"),
+        port = os.getenv("PORT", "8050"),
         debug=True,
         use_reloader=False
     )

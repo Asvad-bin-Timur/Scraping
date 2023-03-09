@@ -8,3 +8,4 @@ PyYAML
 dash-bootstrap-components
 wordcloud
 seaborn
+gunicorn

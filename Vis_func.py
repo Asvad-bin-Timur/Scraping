@@ -127,9 +127,9 @@ def bar_plot(
 
 
 def count_plot(
-        df,
-        name_of_category_column,
-        title_name
+    df,
+    name_of_category_column,
+    title_name
 ):
     all_categories = []
     for record in df[name_of_category_column]:
