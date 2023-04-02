@@ -4,7 +4,11 @@ import plotly.express as px
 import re
 from wordcloud import WordCloud, STOPWORDS
 import plotly.graph_objs as go
-
+import numpy as np
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from PIL import Image
+import random
 
 def reformat_large_tick_values(
         tick_val
@@ -95,13 +99,16 @@ def bar_plot(
         by=['value'],
         ascending=True
     )
-    fig = px.histogram(
+
+    fig = px.bar(
         data_frame=df_small,
         y='variable',
         x='value',
         title=title_name,
-        text_auto='.2s'
+        text_auto='.2s',
+        color=df_small['value'],
     )
+    
     fig.update_layout(
         barmode='stack',
         xaxis={
@@ -114,13 +121,16 @@ def bar_plot(
             'title': None,
             'showticklabels': True
         },
+        plot_bgcolor='white',
         xaxis_range=scale_of_axis,
         width=600,
         height=600,
         title={
             'x': 0.5,
             'xanchor': 'center'
-        }
+        },
+        coloraxis_colorscale='RdBu_r',
+        showlegend=False
     )
 
     return fig
@@ -147,7 +157,7 @@ def count_plot(
     dictionary = dict(sorted(
         dictionary.items(),
         key=lambda x: x[1],
-        reverse=True
+        reverse=False
     ))
     df_small = pd.melt(pd.DataFrame(
         dictionary,
@@ -159,7 +169,9 @@ def count_plot(
         data_frame=df_small,
         names=df_small['variable'],
         values=df_small['value'],
-        title=title_name
+        title=title_name,
+        hole=.6,
+        color_discrete_sequence=px.colors.sequential.RdBu
     )
     fig.update_layout(
         title={
@@ -188,10 +200,14 @@ def words_cloud(df, column='Слоган'):
         background_color="white",
         min_word_length=4,
         collocation_threshold=10,
-        scale=2,
+        scale=3,
         width=700,
-        height=400
+        height=500,
     ).generate(text)
+
+    color_range = px.colors.sequential.RdBu
+    wordcloud = wordcloud.recolor(color_func=lambda *args, **kwargs: random.choice(color_range))
+
     # get the dimensions of the word cloud image
     width, height = wordcloud.width, wordcloud.height
     # create a figure using Plotly's make_subplots function
@@ -225,6 +241,7 @@ def box_plot(df, measurement_column):
             y=df['Оценка фильма'],
             orientation='h',
             name='Box Plot',
+            fillcolor='rgb(178, 24, 43)'
         ),
         row=1,
         col=1
@@ -232,10 +249,10 @@ def box_plot(df, measurement_column):
 
     # update layout
     fig.update_layout(
-        title='Box Plot',
         xaxis=dict(title=measurement_column),
-        yaxis=dict(title='Оценка фильма'),
+        yaxis=dict(title='Оценка фильма', dtick=0.1),
         width=600,
+        plot_bgcolor='white',
         height=500,
         margin=dict(
             l=(1 - 0.8) / 2 * 600,
@@ -246,3 +263,4 @@ def box_plot(df, measurement_column):
     )
 
     return fig
+

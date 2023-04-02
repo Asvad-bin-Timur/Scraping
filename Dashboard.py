@@ -36,10 +36,19 @@ years = [
 ]
 
 # Create the line plot
-fig = px.line(
-    viewers_per_year,
-    title='Maximum number of viewers per year of production'
-)
+def line_plot(viewers_per_year=viewers_per_year):
+    fig = px.line(
+        viewers_per_year,
+        title='Maximum number of viewers per year of production',
+    )
+    fig.update_traces(line_color='red')
+    fig.update_layout(
+        xaxis_title='Year',
+        yaxis_title='Max viewers',
+        xaxis=dict(showgrid=False),
+        yaxis=dict(showgrid=False)
+    )
+    return fig
 
 # Define the layout of the app
 app.layout = html.Div(
@@ -48,15 +57,149 @@ app.layout = html.Div(
                 style={
                     "text-align": "center",
                     'color': '#FFEBCD',
-                    "background-color": "#008080",
-                    "font-family": "Arial, sans-serif"}),
+                    "background-color": "#67001F",
+                    "font-family": "ui-monospace"}),
         dbc.Row(
             [
-                dbc.Card(
+                dbc.Col(
                     [
-                        dbc.CardHeader("Select years"),
+                    dbc.Card(
+                        [
                         dbc.CardBody(
-                            dcc.RangeSlider(
+                            [
+                            dbc.Row(
+                                [
+                                dbc.Col(
+                                    dcc.Dropdown(
+                                            options=[
+                                                {'label': 'Genres', 'value': 'Genres'},
+                                                {'label': 'Countries', 'value': 'Countries'}
+                                            ],
+                                            value='Genres',
+                                            id='dropdown_bar_category',
+                                            className='dropdown-bar-category',
+                                        ),
+                                ),
+                                dbc.Col(
+                                    dcc.Dropdown(
+                                        options=[
+                                            {'label': 'Revenue', 'value': 'Revenue'},
+                                            {'label': 'Viewers', 'value': 'Viewers'},
+                                            {'label': 'Score', 'value': 'Score'}
+                                        ],
+                                        value='Revenue',
+                                        id='dropdown_bar_measure',
+                                        className='dropdown-bar-measure',
+                                    ),
+                                ),
+                                ]
+                            ),
+                            dcc.Graph(
+                                id='bar_plot',
+                                figure=bar_plot(
+                                    df=df,
+                                    name_of_category_column='Жанр',
+                                    name_of_measerment_column='Сборы в мире',
+                                    title_name='The average Revenue of top films by genre'
+                                ),
+                                className='bar-chart'
+                            ),
+                            ]
+                        ),
+                        ],
+                        className='bar-chart-container',
+                        style={'height': '52%', 'margin-top': '20px', 'border-radius': '15px'},
+                    ),
+                    dbc.Card(
+                        [
+                            dbc.CardHeader('Words Cloud'),
+                            dbc.CardBody(
+                                dcc.Graph(
+                                    id='word_cloud',
+                                    figure=words_cloud(df=df),
+                                    className='graph',
+                                    style={'height': '300px', 'width': '100%'}
+                                ),
+                            ),
+                        ],
+                        className='words-cloud-container',
+                        style={'height': '44%', 'margin-top': '20px', 'border-radius': '15px'}
+                    ),
+                ],
+                md=6,
+                ),
+                dbc.Col(
+                    [
+                    dbc.Card(
+                        [
+                            dbc.CardBody([
+                                dcc.RadioItems(
+                                    options=[
+                                        {'label': 'Genres', 'value': 'Genres'},
+                                        {'label': 'Countries', 'value': 'Countries'}
+                                    ],
+                                    value='Genres',
+                                    id='dropdown_pie',
+                                    className='dropdown',
+                                    labelStyle={"display": "block", "margin-bottom": "10px"},
+                                    inputStyle={"margin-right": "5px"}
+                                ),
+                                dcc.Graph(
+                                    id='number_of_films',
+                                    figure=count_plot(
+                                        df=df,
+                                        name_of_category_column='Жанр',
+                                        title_name='The percentage of top films by genre'
+                                    ),
+                                    className='pie-chart'
+                                ),
+                                ]
+                            ),
+                        ],
+                        className='pie-chart-container',
+                        style={'height': '46%', 'margin-top': '20px', 'border-radius': '15px'}
+                    ),
+
+                    dbc.Card(
+                        [
+                            dbc.CardBody([
+                                dcc.RadioItems(
+                                        options=[
+                                            {'label': 'Сборы в мире', 'value': 'Сборы в мире'},
+                                            {'label': 'Кол-во зрителей', 'value': 'Зрители'},
+                                            {'label': 'Бюджет', 'value': 'Бюджет'}
+                                        ],
+                                        value='Зрители',
+                                        id='dropdown_box',
+                                        className='dropdown',
+                                        labelStyle={"display": "block", "margin-bottom": "10px"},
+                                        inputStyle={"margin-right": "5px"}
+                                    ),
+                                dcc.Graph(
+                                    id='box_plot',
+                                    figure=box_plot(
+                                        df=df,
+                                        measurement_column='Зрители'
+                                    ),
+                                    className='box-plot'
+                                ),
+                            ])
+                        ],
+                        className='box-plot-container',
+                        style={'height': '50%', 'margin-top': '20px', 'border-radius': '15px'}
+                    ),
+                    ],
+                    md=6,
+
+                ),
+            ],
+        ),
+        dbc.Row(
+            [
+            dbc.Card(
+                [
+                    dbc.CardBody([
+                        dcc.RangeSlider(
                                 min=df['Год производства'].min(),
                                 max=df['Год производства'].max(),
                                 id='slider_years',
@@ -71,180 +214,21 @@ app.layout = html.Div(
                                 step=1,
                                 className='range-slider'
                             ),
+                        dcc.Graph(
+                            id='viewers_per_year',
+                            figure=line_plot(),
+                            className='line-plot'
                         ),
-                    ],
-                    className='range-slider-container',
-                    style={'height': '8%'}
-                ),
-                dbc.Card(
-                    [
-                        dbc.CardHeader("Line graph"),
-                        dbc.CardBody(
-                            dcc.Graph(
-                                id='viewers_per_year',
-                                figure=fig,
-                                className='line-plot'
-                            ),
-                        ),
-                    ],
-                    className='line-plot-container',
-                    style={'height': '32%'}
-                ),
-                dbc.Col(
-                    [
-                        dbc.Card(
-                            [
-                                dbc.CardHeader(
-                                    "Select bar chart category and measure"),
-                                dbc.CardBody(
-                                    [
-                                        dcc.Dropdown(
-                                            options=[
-                                                {'label': 'Genres', 'value': 'Genres'},
-                                                {'label': 'Countries', 'value': 'Countries'}
-                                            ],
-                                            value='Genres',
-                                            id='dropdown_bar_category',
-                                            className='dropdown-bar-category'
-                                        ),
-                                        dcc.Dropdown(
-                                            options=[
-                                                {'label': 'Revenue', 'value': 'Revenue'},
-                                                {'label': 'Viewers', 'value': 'Viewers'},
-                                                {'label': 'Score', 'value': 'Score'}
-                                            ],
-                                            value='Revenue',
-                                            id='dropdown_bar_measure',
-                                            className='dropdown-bar-measure'
-                                        ),
-                                    ],
-                                ),
-                            ],
-                            className='dropdown-bar-container',
-                            style={'height': '10%', 'margin-top': '20px'}
-                        ),
-                        dbc.Card(
-                            [
-                                dbc.CardHeader("Bar plot"),
-                                dbc.CardBody(
-                                    dcc.Graph(
-                                        id='bar_plot',
-                                        figure=bar_plot(
-                                            df=df,
-                                            name_of_category_column='Жанр',
-                                            name_of_measerment_column='Сборы в мире',
-                                            title_name='The average Revenue of top films by genre'
-                                        ),
-                                        className='bar-chart'
-                                    ),
-                                ),
-                            ],
-                            className='bar-chart-container',
-                        ),
-                        dbc.Card(
-                            [
-                                dbc.CardHeader('Words Cloud'),
-                                dbc.CardBody(
-                                    dcc.Graph(
-                                        id='word_cloud',
-                                        figure=words_cloud(df=df),
-                                        className='graph'
-                                    ),
-                                ),
-                            ],
-                            className='words-cloud-container',
-                            style={'height': '38%', 'margin-top': '20px'}
-                        ),
-                    ],
-                    md=6,
-                ),
-                dbc.Col(
-                    [
-                        dbc.Card(
-                            [
-                                dbc.CardHeader("Select pie chart category"),
-                                dbc.CardBody(
-                                    dcc.RadioItems(
-                                        options=[
-                                            {'label': 'Genres', 'value': 'Genres'},
-                                            {'label': 'Countries', 'value': 'Countries'}
-                                        ],
-                                        value='Genres',
-                                        id='dropdown_pie',
-                                        className='dropdown',
-                                        labelStyle={"display": "block", "margin-bottom": "10px"},
-                                        inputStyle={"margin-right": "5px"}
-                                    ),
-                                ),
-                            ],
-                            className='dropdown-container',
-                            style={'height': '8%', 'margin-top': '20px'}
-                        ),
-                        dbc.Card(
-                            [
-                                dbc.CardHeader("Pie chart"),
-                                dbc.CardBody(
-                                    dcc.Graph(
-                                        id='number_of_films',
-                                        figure=count_plot(
-                                            df=df,
-                                            name_of_category_column='Жанр',
-                                            title_name='The percentage of top films by genre'
-                                        ),
-                                        className='pie-chart'
-                                    ),
-                                ),
-                            ],
-                            className='pie-chart-container',
-                            style={'height': '40%'}
-                        ),
-
-                        dbc.Card(
-                            [
-                                dbc.CardHeader("Select x-axis"),
-                                dbc.CardBody(
-                                    dcc.RadioItems(
-                                        options=[
-                                            {'label': 'Сборы в мире', 'value': 'Сборы в мире'},
-                                            {'label': 'Кол-во зрителей', 'value': 'Зрители'},
-                                            {'label': 'Бюджет', 'value': 'Бюджет'}
-                                        ],
-                                        value='Зрители',
-                                        id='dropdown_box',
-                                        className='dropdown',
-                                        labelStyle={"display": "block", "margin-bottom": "10px"},
-                                        inputStyle={"margin-right": "5px"}
-                                    ),
-                                ),
-                            ],
-                            className='dropdown-container',
-                            style={'height': '11%', 'margin-top': '20px'}
-                        ),
-                        dbc.Card(
-                            [
-                                dbc.CardHeader("Box plot"),
-                                dbc.CardBody(
-                                    dcc.Graph(
-                                        id='box_plot',
-                                        figure=box_plot(
-                                            df=df,
-                                            measurement_column='Зрители'
-                                        ),
-                                        className='box-plot'
-                                    ),
-                                ),
-                            ],
-                            className='box-plot-container',
-                            style={'height': '40%'}
-                        ),
-                    ],
-                    md=6,
-
-                ),
+                    ]
+                    ),
+                ],
+                className='line-plot-container',
+                style={'height': '32%', 'width':'100%', 'margin-top': '20px', 'border-radius': '15px'}
+            ),
             ],
-            style={'background-color': '#FFFAF0'}
         ),
     ],
+    style={'background-color': '#FFEBCD'}
 )
 
 # Define the callbacks
@@ -260,14 +244,7 @@ def update_graph(years_list):
         (df['Год производства'] <= years_list[1])
     ]
     viewers_per_year = dff.groupby('Год производства')['Зрители'].max()
-    fig = px.line(
-        viewers_per_year,
-        title='Maximum number of viewers per year of production'
-    )
-    fig.update_layout(
-        xaxis_title='Year',
-        yaxis_title='Max viewers'
-    )
+    fig = line_plot(viewers_per_year=viewers_per_year)
     return fig
 
 
