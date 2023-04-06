@@ -1,0 +1,15 @@
+FROM python:3.10.2-slim-buster
+WORKDIR /app
+COPY req.txt .
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc && \
+    python -m venv venv && \
+    venv/bin/pip install --upgrade pip && \
+    venv/bin/pip install -r req.txt
+COPY Dashboard.py .
+COPY Vis_func.py .
+COPY Notebook.ipynb .
+COPY --from=data-parsing /app/KinoPoisk.db .
+ENTRYPOINT [ "/app/venv/bin/python","/app/Dashboard.py" ]
+
+
