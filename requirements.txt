@@ -12,4 +12,3 @@ PyYAML==6.0
 wordcloud==1.8.2.2
 seaborn==0.12.1
 nltk==3.8.1
->>>>>>> Stashed changes

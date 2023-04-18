@@ -11,7 +11,8 @@ from PIL import Image
 import random
 
 def reformat_large_tick_values(
-        tick_val
+        tick_val,
+        pos
 ):
     """
     Turns large tick values (in the billions, millions and thousands)
