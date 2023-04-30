@@ -14,21 +14,21 @@ def find_links(parser: KinoPoisk) -> list[str]:
     while True:
         url_of_page = parser.base_url + str(page)
         parser.go_to_page(url_of_page)
-        logger.info(f'Went to page: {page}')
+        logger.info('Went to page: %s', page)
         try:
             links = parser.find_film_links()
-        except:
+        except ImportError:
             logger.info('There is a captcha, please pass it manually')
             time.sleep(15)
             links = parser.find_film_links()
-        logger.info(f'Parsed {len(links)} links')
+        logger.info('Parsed %s links', len(links))
         if links != []:
             all_links.extend(links)
             page += 1
             continue
         else:
             break
-    logger.info(f'Total parsed links: {len(all_links)}')
+    logger.info('Total parsed links: %s', len(all_links))
 
     return all_links
 
@@ -39,12 +39,12 @@ def find_all_film_data(parser: KinoPoisk, all_links: list) -> list[dict]:
         parser.go_to_page(link)
         try:
             film_data = parser.film_characteristics()
-        except:
+        except ImportError:
             logger.info('There is a captcha, please pass it manually')
             time.sleep(15)
             film_data = parser.film_characteristics()
         all_film_data.append(film_data)
-        logger.info(f'Got data from the {link_number+1} link film')
+        logger.info('Got data from the %s link film', link_number+1)
     return all_film_data
 
 

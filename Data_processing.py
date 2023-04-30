@@ -1,16 +1,16 @@
 import pandas as pd
 from currency_converter import CurrencyConverter
 from datetime import date
-import pandas as pd
 
 
 class DataTransformation():
 
     def __init__(
         self,
-        df
+        df,
     ):
         self.df = df
+        self.df_cleared = None
 
     def dropping_columns(self, thresh_number=170):
         self.df_cleared = self.df.dropna(axis=1, thresh=thresh_number)
@@ -27,6 +27,7 @@ class DataTransformation():
         converter = CurrencyConverter()
         cell = (converter.convert(cell, currency_input,
                 currency_required, date=date(year, 1, 1)))
+        return cell
 
     def clear_column(self, column, replacement, to_be_replaced):
         self.df_cleared[column] = self.df_cleared[column].str.replace(
@@ -60,11 +61,11 @@ class DataTransformation():
                         cell=x, symbol_to_be_replaced=currency, replacement='')
                     x = float(x)
                     x = self.convert_to_currency(
-                        cell=x, currency=currencies[currencies_signs.index(currency)], year=date(year, 1, 1))
+                        cell=x, currency_input=currencies[currencies_signs.index(currency)], year=date(year, 1, 1))
                 else:
                     continue
             return x
-        except:
+        except ImportError:
             return x
 
     def budget_column(self):

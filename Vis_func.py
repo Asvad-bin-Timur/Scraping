@@ -1,14 +1,11 @@
+import re
+import random
 import pandas as pd
 from plotly.subplots import make_subplots
 import plotly.express as px
-import re
 from wordcloud import WordCloud, STOPWORDS
 import plotly.graph_objs as go
-import numpy as np
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-from PIL import Image
-import random
+
 
 def reformat_large_tick_values(
         tick_val,
@@ -109,7 +106,7 @@ def bar_plot(
         text_auto='.2s',
         color=df_small['value'],
     )
-    
+
     fig.update_layout(
         barmode='stack',
         xaxis={
@@ -207,7 +204,8 @@ def words_cloud(df, column='Слоган'):
     ).generate(text)
 
     color_range = px.colors.sequential.RdBu
-    wordcloud = wordcloud.recolor(color_func=lambda *args, **kwargs: random.choice(color_range))
+    wordcloud = wordcloud.recolor(
+        color_func=lambda *args, **kwargs: random.choice(color_range))
 
     # get the dimensions of the word cloud image
     width, height = wordcloud.width, wordcloud.height
@@ -264,4 +262,3 @@ def box_plot(df, measurement_column):
     )
 
     return fig
-
